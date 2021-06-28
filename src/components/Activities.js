@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import ActivitiesCard from "./ActivitiesCard";
 import axios from "axios";
 import { Container, Col, Row, Spinner } from "reactstrap";
+import { BASE_URL } from "../api";
 
 const Activities = () => {
   const [isLoading, setLoading] = useState(true);
@@ -9,11 +10,9 @@ const Activities = () => {
 
   const getAllActivities = async () => {
     try {
-      const { data } = await axios.get(
-        `https://gentle-woodland-79828.herokuapp.com/api/activities`
-      );
+      const { data } = await axios.get(`${BASE_URL}/activities`);
 
-      console.log(data)
+      console.log(data);
       if (data) {
         setActivities(data);
       }

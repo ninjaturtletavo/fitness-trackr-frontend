@@ -26,6 +26,7 @@ export default function Signup() {
       history.push("/");
     } catch (e) {
       console.error(e);
+      console.log(e);
       setError("Failed to create an account");
     }
 

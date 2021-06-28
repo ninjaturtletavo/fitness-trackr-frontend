@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import RoutinesCard from "./RoutinesCard";
 import { Container, Col, Row, Spinner } from "reactstrap";
+import { BASE_URL } from "../api";
 
 const Routines = () => {
   const [isLoading, setLoading] = useState(true);
@@ -10,7 +11,7 @@ const Routines = () => {
   const getAllRoutines = async () => {
     try {
       const { data } = await axios.get(
-        `https://gentle-woodland-79828.herokuapp.com/api/routines`
+        `${BASE_URL}/routines`
       );
 
       console.log(data);
