@@ -1,10 +1,12 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { Form, Button, Card, Alert } from "react-bootstrap";
 import { Link, useHistory } from "react-router-dom";
+import { loginUser } from "../api";
 
 export default function Login() {
-  const usernameRef = useRef();
-  const passwordRef = useRef();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const history = useHistory();
@@ -15,7 +17,7 @@ export default function Login() {
     try {
       setError("");
       setLoading(true);
-      // await login(emailRef.current.value, passwordRef.current.value);
+      await loginUser(username, password);
       history.push("/");
     } catch {
       setError("Failed to log in");
@@ -33,11 +35,23 @@ export default function Login() {
           <Form onSubmit={handleSubmit}>
             <Form.Group id="email">
               <Form.Label>Username</Form.Label>
-              <Form.Control type="text" ref={usernameRef} required />
+              <Form.Control
+                type="text"
+                value={username}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                }}
+              />
             </Form.Group>
             <Form.Group id="password">
               <Form.Label>Password</Form.Label>
-              <Form.Control type="password" ref={passwordRef} required />
+              <Form.Control
+                type="text"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                }}
+              />
             </Form.Group>
             <Button disabled={loading} className="w-100" type="submit">
               Log In

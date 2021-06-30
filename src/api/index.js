@@ -1,21 +1,42 @@
-// export const BASE_URL = "https://gentle-woodland-79828.herokuapp.com/api";
-export const BASE_URL = "https://fitnesstrac-kr.herokuapp.com/api";
+export const BASE_URL = "https://gentle-woodland-79828.herokuapp.com/api";
+// export const BASE_URL = "https://fitnesstrac-kr.herokuapp.com/api";
+
+export const setToken = (token) => {
+  localStorage.setItem("token", token);
+};
+
+export const getToken = () => {
+  return localStorage.getItem("token");
+};
+
+export const headers = () => {
+  if (getToken()) {
+    return {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`,
+    };
+  } else {
+    return { "Content-Type": "Application/JSON" };
+  }
+};
 
 export const registerUser = async (username, password) => {
   try {
     const response = await fetch(`${BASE_URL}/users/register`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: headers(),
       body: JSON.stringify({
-        username: username,
-        password: password,
+        username,
+        password,
       }),
     });
+    console.log(response);
     const data = await response.json();
-    localStorage.setItem("token", JSON.stringify(data.token));
-    localStorage.setItem("user", JSON.stringify(data.user));
+
+    if (data && data.token) {
+      setToken(data.token);
+    }
+
     return data;
   } catch (error) {
     throw error;
@@ -26,17 +47,19 @@ export const loginUser = async (username, password) => {
   try {
     const response = await fetch(`${BASE_URL}/users/login`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: headers(),
       body: JSON.stringify({
         username: username,
         password: password,
       }),
     });
+
     const data = await response.json();
-    localStorage.setItem("token", JSON.stringify(data.token));
-    localStorage.setItem("user", JSON.stringify(data.user));
+
+    if (data && data.token) {
+      setToken(data.token);
+    }
+
     return data;
   } catch (error) {
     throw error;
@@ -44,30 +67,25 @@ export const loginUser = async (username, password) => {
 };
 
 export const getMe = async () => {
-  const token = localStorage.getItem("token");
-
-  if (!token) return;
-
   try {
     const response = await fetch(`${BASE_URL}/users/me`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      method: "GET",
+      headers: headers(),
     });
+
     const data = await response.json();
+
     return data;
   } catch (error) {
     throw error;
   }
 };
 
-export const getPublicRoutinesByUser = async (username) => {
+export const getRoutinesByUser = async (username) => {
   try {
     const response = await fetch(`${BASE_URL}/users/${username}/routines`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
+      method: "GET",
+      headers: headers(),
     });
     const data = await response.json();
 
@@ -80,35 +98,31 @@ export const getPublicRoutinesByUser = async (username) => {
 export const getAllActivities = async () => {
   try {
     const response = await fetch(`${BASE_URL}/activities`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
+      method: "GET",
+      headers: headers(),
     });
+
     const data = await response.json();
+
     return data;
   } catch (error) {
     throw error;
   }
 };
 
-
 export const createActivity = async (name, description) => {
   try {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
     const response = await fetch(`${BASE_URL}/activities`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: headers(),
       body: JSON.stringify({
-        name: name,
-        description: description,
+        name,
+        description,
       }),
     });
+
     const data = await response.json();
+
     return data;
   } catch (error) {
     throw error;
@@ -117,30 +131,32 @@ export const createActivity = async (name, description) => {
 
 export const updateActivity = async (id, name, description) => {
   try {
-    const token = localStorage.getItem("token");
-    if (!token) return;
     const response = await fetch(`${BASE_URL}/activities/${id}`, {
       method: "PATCH",
+      headers: headers(),
       body: JSON.stringify({
-        name: name,
-        description: description,
+        name,
+        description,
       }),
     });
+
     const data = await response.json();
+
     return data;
   } catch (error) {
     throw error;
   }
 };
 
-export const getPublicRoutinesByActivity = async (id) => {
+export const getRoutinesByActivity = async (id) => {
   try {
     const response = await fetch(`${BASE_URL}/activities/${id}/routines`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
+      method: "GET",
+      headers: headers(),
     });
+
     const data = await response.json();
+
     return data;
   } catch (error) {
     throw error;
@@ -150,11 +166,12 @@ export const getPublicRoutinesByActivity = async (id) => {
 export const getAllRoutines = async () => {
   try {
     const response = await fetch(`${BASE_URL}/routines`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
+      method: "GET",
+      headers: headers(),
     });
+
     const data = await response.json();
+
     return data;
   } catch (error) {
     throw error;
@@ -163,72 +180,53 @@ export const getAllRoutines = async () => {
 
 export const createRoutine = async (name, goal, isPublic) => {
   try {
-    const token = localStorage.getItem("token");
-
-    if (!token) return;
-
     const response = await fetch(`${BASE_URL}/routines`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: headers(),
       body: JSON.stringify({
-        name: name,
-        goal: goal,
-        isPublic: isPublic,
+        name,
+        goal,
+        isPublic,
       }),
     });
+
     const data = await response.json();
+
     return data;
   } catch (error) {
     throw error;
   }
 };
 
-
-export const updateRoutine = async (
-  routineId,
-  name,
-  goal,
-  isPublic
-) => {
+export const updateRoutine = async (id, name, goal, isPublic) => {
   try {
-    const token = localStorage.getItem("token");
-
-    if (!token) return;
-
-    const response = await fetch(`${BASE_URL}/routines/${routineId}`, {
+    const response = await fetch(`${BASE_URL}/routines/${id}`, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: headers(),
       body: JSON.stringify({
-        name: name,
-        goal: goal,
-        isPublic: isPublic,
+        name,
+        goal,
+        isPublic,
       }),
     });
+
     const data = await response.json();
+
     return data;
   } catch (error) {
     throw error;
   }
 };
 
-export const deleteRoutine = async (routineId) => {
+export const deleteRoutine = async (id) => {
   try {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-    const response = await fetch(`${BASE_URL}/routines/${routineId}`, {
+    const response = await fetch(`${BASE_URL}/routines/${id}`, {
       method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: headers(),
     });
+
     const data = await response.json();
+
     return data;
   } catch (error) {
     throw error;
@@ -242,71 +240,55 @@ export const addActivityToRoutine = async (
   count
 ) => {
   try {
-
     const response = await fetch(
       `${BASE_URL}/routines/${routineId}/activities`,
       {
         method: "POST",
+        headers: headers(),
         body: JSON.stringify({
-          activityId: activityId,
-          duration: duration,
-          count: count,
+          activityId,
+          duration,
+          count,
         }),
       }
     );
+
     const data = await response.json();
+
     return data;
   } catch (error) {
     throw error;
   }
 };
 
-export const updateRoutineWithNewActivity = async (
-  routineActivityId,
-  count,
-  duration
-) => {
+export const updateRoutineWithNewActivity = async (id, count, duration) => {
   try {
-    const token = localStorage.getItem("token");
+    const response = await fetch(`${BASE_URL}/routine_activities/${id}`, {
+      method: "PATCH",
+      headers: headers(),
+      body: JSON.stringify({
+        count,
+        duration,
+      }),
+    });
 
-    if (!token) return;
-
-    const response = await fetch(
-      `${BASE_URL}/routine_activities/${routineActivityId}`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          count: count,
-          duration: duration,
-        }),
-      }
-    );
     const data = await response.json();
+
     return data;
   } catch (error) {
     throw error;
   }
 };
 
-export const deleteActivityFromRoutine = async (routineActivityId) => {
+export const deleteActivityFromRoutine = async (id) => {
   try {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-    const response = await fetch(
-      `${BASE_URL}/routine_activities/${routineActivityId}`,
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await fetch(`${BASE_URL}/routine_activities/${id}`, {
+      method: "DELETE",
+      headers: headers(),
+    });
+
     const data = await response.json();
+
     return data;
   } catch (error) {
     throw error;
